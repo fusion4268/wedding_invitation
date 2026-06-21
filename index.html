@@ -107,7 +107,8 @@ body{
   text-align:center;padding:6px 28px 60px;position:relative;z-index:2;
   background:var(--bg);
 }
-.hero-date .date{font-family:'Noto Serif KR',serif;font-size:17px;letter-spacing:.04em;color:var(--ink);}
+.hero-date .date{font-family:'Noto Serif KR',serif;font-size:17px;letter-spacing:.04em;color:var(--ink);word-break:keep-all;}
+.hero-date .date .nb{white-space:nowrap;}
 .hero-date .venue{font-family:'Noto Serif KR',serif;font-size:14px;color:var(--muted);margin-top:6px;}
 
 /* section title */
@@ -398,7 +399,7 @@ body{
 
   <!-- HERO : date / venue -->
   <section class="hero-date">
-    <div class="date">2026년 11월 8일 일요일 오후 1시 30분</div>
+    <div class="date">2026년 11월 8일 일요일 <span class="nb">오후 1시 30분</span></div>
     <div class="venue">라루체 웨딩 5층 그레이스홀</div>
   </section>
 
