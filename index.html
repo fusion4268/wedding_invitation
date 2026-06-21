@@ -799,30 +799,64 @@ document.querySelectorAll('.copy-btn').forEach(btn=>{
   setTimeout(open, 1200);
 })();
 
-// 방명록 (구글 시트 연동: 저장 + 기존 글 불러오기)
+// 방명록 (구글 시트 연동: 저장 + 불러오기 + 본인 글 수정/삭제)
 (function(){
   const list=document.getElementById('guestList');
   const empty=document.getElementById('guestEmpty');
-  function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  const LS='gb_tokens';
+  function tokens(){ try{return JSON.parse(localStorage.getItem(LS)||'{}');}catch(e){return {};} }
+  function saveTok(id,t){ const m=tokens(); m[id]=t; try{localStorage.setItem(LS,JSON.stringify(m));}catch(e){} }
+  function delTok(id){ const m=tokens(); delete m[id]; try{localStorage.setItem(LS,JSON.stringify(m));}catch(e){} }
+  function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function fmt(d){ return (d.getMonth()+1)+'월 '+d.getDate()+'일'; }
-  function addEntry(name,msg,when){
+  function uid(){ return 'g'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+  function post(payload){ if(RSVP_ENDPOINT){ fetch(RSVP_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}).catch(()=>{}); } }
+
+  function render(el,name,msg){
+    const id=el.dataset.id, mine=id && tokens()[id];
+    el.innerHTML='<div class="ge-head"><span class="ge-name">'+esc(name)+'</span><span class="ge-date">'+el.dataset.date+'</span></div><div class="ge-msg">'+esc(msg)+'</div>';
+    if(mine){
+      const tok=tokens()[id];
+      const act=document.createElement('div'); act.className='ge-actions';
+      const eb=document.createElement('button'); eb.type='button'; eb.className='ge-act'; eb.textContent='수정';
+      const db=document.createElement('button'); db.type='button'; db.className='ge-act'; db.textContent='삭제';
+      act.appendChild(eb); act.appendChild(db); el.appendChild(act);
+      db.addEventListener('click',()=>{
+        if(!confirm('이 글을 삭제할까요?')) return;
+        post({type:'guestbook_delete',id:id,token:tok});
+        delTok(id); el.remove(); toast('삭제되었습니다.');
+      });
+      eb.addEventListener('click',()=>{
+        const ta=document.createElement('textarea'); ta.className='ge-edit'; ta.value=msg;
+        const row=document.createElement('div'); row.className='ge-editrow';
+        const sv=document.createElement('button'); sv.type='button'; sv.className='ge-savebtn'; sv.textContent='저장';
+        const cc=document.createElement('button'); cc.type='button'; cc.className='ge-cancelbtn'; cc.textContent='취소';
+        row.appendChild(cc); row.appendChild(sv);
+        el.querySelector('.ge-msg').replaceWith(ta); act.replaceWith(row); ta.focus();
+        cc.addEventListener('click',()=>render(el,name,msg));
+        sv.addEventListener('click',()=>{
+          const nv=ta.value.trim(); if(!nv){toast('내용을 입력해 주세요.');return;}
+          post({type:'guestbook_update',id:id,token:tok,msg:nv});
+          render(el,name,nv); toast('수정되었습니다.');
+        });
+      });
+    }
+  }
+  function addEntry(name,msg,when,id){
     if(empty) empty.style.display='none';
     const d=when?new Date(when):new Date();
-    const el=document.createElement('div');
-    el.className='guest-entry';
-    el.innerHTML='<div class="ge-head"><span class="ge-name">'+esc(name)+'</span><span class="ge-date">'+fmt(d)+'</span></div><div class="ge-msg">'+esc(msg)+'</div>';
+    const el=document.createElement('div'); el.className='guest-entry';
+    el.dataset.date=fmt(d); if(id) el.dataset.id=id;
+    render(el,name,msg);
     list.insertBefore(el, list.firstChild);
   }
-  // 기존 방명록 불러오기 (JSONP로 CORS 우회) — 오래된 글부터 넣어 최신이 위로 오게
+  // 기존 방명록 불러오기 (JSONP) — 오래된 글부터 넣어 최신이 위로
   function loadGuestbook(){
     if(!RSVP_ENDPOINT) return;
     const cb='__gb'+Math.floor(Math.random()*1e9);
     const s=document.createElement('script');
     const cleanup=()=>{ try{delete window[cb];}catch(e){} if(s.parentNode) s.parentNode.removeChild(s); };
-    window[cb]=function(rows){
-      if(rows && rows.length){ rows.forEach(r=>addEntry(r.name,r.msg,r.when)); }
-      cleanup();
-    };
+    window[cb]=function(rows){ if(rows&&rows.length){ rows.forEach(r=>addEntry(r.name,r.msg,r.when,r.id)); } cleanup(); };
     s.onerror=cleanup;
     s.src=RSVP_ENDPOINT+'?type=guestbook&callback='+cb+'&t='+Date.now();
     document.body.appendChild(s);
@@ -832,10 +866,10 @@ document.querySelectorAll('.copy-btn').forEach(btn=>{
     const msg=document.getElementById('gMsg').value.trim();
     if(!name){toast('이름을 입력해 주세요.');return;}
     if(!msg){toast('전할 말을 입력해 주세요.');return;}
-    if(RSVP_ENDPOINT){
-      fetch(RSVP_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'guestbook',name,msg})}).catch(()=>{});
-    }
-    addEntry(name,msg);
+    const id=uid(), tok=uid();
+    saveTok(id,tok);
+    post({type:'guestbook',id:id,token:tok,name:name,msg:msg});
+    addEntry(name,msg,null,id);
     document.getElementById('gName').value='';
     document.getElementById('gMsg').value='';
     toast('소중한 축하 감사합니다!');
