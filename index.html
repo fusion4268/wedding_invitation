@@ -721,18 +721,21 @@ function toast(msg){
 
 // BGM
 const bgm=document.getElementById('bgm'), bgmBtn=document.getElementById('bgmBtn');
-bgmBtn.addEventListener('click',()=>{
-  if(bgm.paused){
-    bgm.play().then(()=>{
-      bgmBtn.classList.add('playing');
-      bgmBtn.innerHTML='<svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1" class="bar"/><rect x="14" y="5" width="4" height="14" rx="1" class="bar"/></svg>';
-    }).catch(()=>toast('음원 파일을 연결하면 재생됩니다.'));
-  }else{
-    bgm.pause();
-    bgmBtn.classList.remove('playing');
-    bgmBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-  }
+const ICON_PLAY='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+const ICON_BARS='<svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1" class="bar"/><rect x="14" y="5" width="4" height="14" rx="1" class="bar"/></svg>';
+function bgmPlay(){ return bgm.play().then(()=>{ bgmBtn.classList.add('playing'); bgmBtn.innerHTML=ICON_BARS; }); }
+function bgmPause(){ bgm.pause(); bgmBtn.classList.remove('playing'); bgmBtn.innerHTML=ICON_PLAY; }
+bgmBtn.addEventListener('click',function(e){
+  e.stopPropagation();
+  if(bgm.paused){ bgmPlay().catch(()=>toast('재생할 수 없어요.')); } else { bgmPause(); }
 });
+// 브라우저는 사용자 동작 없이 소리 자동재생을 막으므로, 첫 화면 터치 시 자동 시작 (버튼 탭은 제외)
+function bgmFirstGesture(e){
+  if(bgmBtn.contains(e.target)) return;
+  bgmPlay().then(()=>{ document.removeEventListener('pointerdown',bgmFirstGesture); }).catch(()=>{});
+}
+document.addEventListener('pointerdown',bgmFirstGesture);
+bgmPlay().catch(()=>{}); // 로드 시 자동재생 시도(대개 차단되며, 위 첫 터치에서 시작됨)
 
 // contact toggle
 const ct=document.getElementById('contactToggle'), cp=document.getElementById('contactPanel');
