@@ -170,6 +170,11 @@ body{
 .ci-btn.call svg{fill:var(--green);}
 .ci-btn.sms svg{fill:var(--accent);}
 
+/* gallery fallback (JS가 캐러셀로 변환하기 전/실패 시) */
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.gallery .g-cell{aspect-ratio:3/4;overflow:hidden;border-radius:4px;background:linear-gradient(135deg,#f0e9df,#e6dccd);}
+.gallery .g-cell img{width:100%;height:100%;object-fit:cover;display:block;}
+
 /* album carousel */
 .album{margin-top:8px;}
 .album-track{
