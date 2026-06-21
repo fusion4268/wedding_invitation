@@ -48,6 +48,8 @@ body{
   box-shadow:0 0 40px rgba(0,0,0,.08);
 }
 .eng{font-family:'Cormorant Garamond',serif;}
+/* 폼 요소는 기본적으로 본문 폰트를 상속하지 않으므로 명시 (청첩장과 통일) */
+input,textarea,button,select{font-family:'Noto Serif KR',serif;font-weight:500;}
 .section{padding:64px 28px;position:relative;}
 .center{text-align:center;}
 
@@ -775,7 +777,7 @@ document.querySelectorAll('.copy-btn').forEach(btn=>{
     if(!count||count<1){toast('참석 인원을 입력해 주세요.');return;}
     const btn=document.getElementById('mSubmit');
     // 엔드포인트 미설정 시: 전송 없이 안내만 (배포 URL 입력 전 동작)
-    if(!RSVP_ENDPOINT){ close(); toast('참석 의사가 전달되었습니다. 감사합니다!'); return; }
+    if(!RSVP_ENDPOINT){ close(); toast('참석 의사가 전달되었습니다.\n감사합니다!'); return; }
     const orig=btn.textContent; btn.disabled=true; btn.textContent='전송 중...';
     fetch(RSVP_ENDPOINT,{
       method:'POST',mode:'no-cors',
