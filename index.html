@@ -782,7 +782,7 @@ document.querySelectorAll('.copy-btn').forEach(btn=>{
       headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify({side,name,count})
     })
-    .then(()=>{ close(); toast('참석 의사가 전달되었습니다. 감사합니다!'); })
+    .then(()=>{ close(); toast('참석 의사가 전달되었습니다.\n감사합니다!'); })
     .catch(()=>{ toast('전송에 실패했어요. 잠시 후 다시 시도해 주세요.'); })
     .finally(()=>{ btn.disabled=false; btn.textContent=orig; });
   });
