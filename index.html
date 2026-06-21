@@ -789,30 +789,48 @@ document.querySelectorAll('.copy-btn').forEach(btn=>{
   setTimeout(open, 1200);
 })();
 
-// 방명록
+// 방명록 (구글 시트 연동: 저장 + 기존 글 불러오기)
 (function(){
   const list=document.getElementById('guestList');
   const empty=document.getElementById('guestEmpty');
   function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function fmt(d){ return (d.getMonth()+1)+'월 '+d.getDate()+'일'; }
   function addEntry(name,msg,when){
     if(empty) empty.style.display='none';
-    const d=when||new Date();
-    const dateStr=(d.getMonth()+1)+'월 '+d.getDate()+'일';
+    const d=when?new Date(when):new Date();
     const el=document.createElement('div');
     el.className='guest-entry';
-    el.innerHTML='<div class="ge-head"><span class="ge-name">'+esc(name)+'</span><span class="ge-date">'+dateStr+'</span></div><div class="ge-msg">'+esc(msg)+'</div>';
+    el.innerHTML='<div class="ge-head"><span class="ge-name">'+esc(name)+'</span><span class="ge-date">'+fmt(d)+'</span></div><div class="ge-msg">'+esc(msg)+'</div>';
     list.insertBefore(el, list.firstChild);
+  }
+  // 기존 방명록 불러오기 (JSONP로 CORS 우회) — 오래된 글부터 넣어 최신이 위로 오게
+  function loadGuestbook(){
+    if(!RSVP_ENDPOINT) return;
+    const cb='__gb'+Math.floor(Math.random()*1e9);
+    const s=document.createElement('script');
+    const cleanup=()=>{ try{delete window[cb];}catch(e){} if(s.parentNode) s.parentNode.removeChild(s); };
+    window[cb]=function(rows){
+      if(rows && rows.length){ rows.forEach(r=>addEntry(r.name,r.msg,r.when)); }
+      cleanup();
+    };
+    s.onerror=cleanup;
+    s.src=RSVP_ENDPOINT+'?type=guestbook&callback='+cb+'&t='+Date.now();
+    document.body.appendChild(s);
   }
   document.getElementById('gSubmit').addEventListener('click',()=>{
     const name=document.getElementById('gName').value.trim();
     const msg=document.getElementById('gMsg').value.trim();
     if(!name){toast('이름을 입력해 주세요.');return;}
     if(!msg){toast('전할 말을 입력해 주세요.');return;}
+    if(RSVP_ENDPOINT){
+      fetch(RSVP_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'guestbook',name,msg})}).catch(()=>{});
+    }
     addEntry(name,msg);
     document.getElementById('gName').value='';
     document.getElementById('gMsg').value='';
     toast('소중한 축하 감사합니다!');
   });
+  loadGuestbook();
 })();
 </script>
 </body>
