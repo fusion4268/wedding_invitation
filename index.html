@@ -138,9 +138,10 @@ body{
 .fam-cards{display:flex;flex-direction:column;gap:12px;margin:4px auto 4px;max-width:340px;}
 .fam-card{
   background:var(--card);border:1px solid var(--line);border-radius:14px;
-  padding:18px 16px;box-shadow:0 3px 14px rgba(58,53,46,.05);
+  padding:6px 16px;box-shadow:0 3px 14px rgba(58,53,46,.05);
 }
-.fam-card .fam-row{margin:0;}
+.fam-card .fam-row{margin:0;padding:14px 0;}
+.fam-card .fam-row + .fam-row{border-top:1px solid var(--line);}
 .fam-row{display:flex;justify-content:center;align-items:center;gap:10px;font-family:'Noto Serif KR',serif;font-size:16px;margin:6px 0;flex-wrap:wrap;}
 .fam-row .label{color:var(--muted);font-size:13px;}
 .fam-row .dot{color:var(--accent);font-size:10px;}
@@ -502,8 +503,8 @@ body{
       <iframe loading="lazy" src="https://maps.google.com/maps?q=%EB%9D%BC%EB%A3%A8%EC%B2%B4%20%EC%9B%A8%EB%94%A9%ED%99%80%20%EB%AA%85%EB%8F%99&t=&z=16&ie=UTF8&iwloc=&output=embed"></iframe>
     </div>
     <div class="map-actions">
-      <a class="map-btn kakao" href="https://map.kakao.com/link/map/라루체 웨딩홀,37.559116633916,126.984455216505" target="_blank" rel="noopener">카카오맵</a>
       <a class="map-btn" href="https://map.naver.com/v5/search/라루체웨딩홀" target="_blank" rel="noopener">네이버지도</a>
+      <a class="map-btn kakao" href="https://map.kakao.com/link/map/라루체 웨딩홀,37.559116633916,126.984455216505" target="_blank" rel="noopener">카카오맵</a>
     </div>
     <div class="transit">
       <div class="t-row"><div class="t-key">지하철</div><div class="t-val">4호선 명동역 3번 출구 (퍼시픽 호텔 우측길로 60m)</div></div>
