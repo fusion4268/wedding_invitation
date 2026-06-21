@@ -636,6 +636,35 @@ body{
   }
 })();
 
+// gallery: 메인 사진을 앨범 맨 앞에 추가 + 사진 클릭 시 확대 보기
+(function(){
+  const gallery=document.querySelector('.gallery');
+  const heroImg=document.querySelector('.hero-photo-full img');
+  // 메인 사진을 앨범 첫 칸으로 추가 (base64 중복 없이 같은 src 재사용)
+  if(gallery && heroImg){
+    const cell=document.createElement('div');
+    cell.className='g-cell';
+    const im=document.createElement('img');
+    im.src=heroImg.currentSrc||heroImg.src;
+    im.alt='메인 사진';
+    cell.appendChild(im);
+    gallery.insertBefore(cell, gallery.firstChild);
+  }
+  const lb=document.getElementById('lightbox');
+  const lbImg=document.getElementById('lbImg');
+  const lbClose=document.getElementById('lbClose');
+  if(!lb||!lbImg) return;
+  function open(src){ lbImg.src=src; lb.classList.add('open'); document.body.style.overflow='hidden'; }
+  function close(){ lb.classList.remove('open'); document.body.style.overflow=''; lbImg.removeAttribute('src'); }
+  if(gallery) gallery.addEventListener('click',function(e){
+    const img=e.target.closest('img'); if(img) open(img.currentSrc||img.src);
+  });
+  if(heroImg){ heroImg.style.cursor='zoom-in'; heroImg.addEventListener('click',()=>open(heroImg.currentSrc||heroImg.src)); }
+  lb.addEventListener('click',close);
+  if(lbClose) lbClose.addEventListener('click',function(e){ e.stopPropagation(); close(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+})();
+
 // toast helper
 function toast(msg){
   const t=document.getElementById('toast');
