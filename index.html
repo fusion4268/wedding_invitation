@@ -417,8 +417,6 @@ body{
         <div class="fam-row">
           김기봉 <span class="dot">·</span> 임미자 <span class="label">의 장남</span> <span class="child">김진수</span>
         </div>
-      </div>
-      <div class="fam-card">
         <div class="fam-row">
           정준규 <span class="dot">·</span> 백남희 <span class="label">의 장녀</span> <span class="child">정혜정</span>
         </div>
@@ -623,14 +621,14 @@ body{
   const wrap=document.getElementById('petals');
   if(!wrap) return;
   const glyphs=['❀','✿','❁','｡'];
-  for(let i=0;i<16;i++){
+  for(let i=0;i<30;i++){
     const p=document.createElement('div');
     p.className='petal';
     p.textContent=glyphs[i%glyphs.length];
     p.style.left=(Math.random()*100)+'%';
-    p.style.animationDuration=(7+Math.random()*7)+'s';
-    p.style.animationDelay=(Math.random()*8)+'s';
-    p.style.fontSize=(12+Math.random()*12)+'px';
+    p.style.animationDuration=(7+Math.random()*6)+'s';
+    p.style.animationDelay=(Math.random()*6)+'s';
+    p.style.fontSize=(16+Math.random()*20)+'px';
     p.style.color=Math.random()>.5?'#cba79a':'#d8c79a';
     wrap.appendChild(p);
   }
