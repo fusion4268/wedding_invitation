@@ -753,6 +753,8 @@ document.querySelectorAll('.copy-btn').forEach(btn=>{
     close();
     toast('참석 의사가 전달되었습니다. 감사합니다!');
   });
+  // 청첩장에 들어오면 참석 의사 팝업을 자동으로 표시 (히어로가 잠깐 보인 뒤)
+  setTimeout(open, 1200);
 })();
 
 // 방명록
