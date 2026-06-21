@@ -2,4 +2,5 @@
 HANDOFF.md
 auto-deploy.ps1
 auto-deploy.log
+rsvp_appsscript.gs
 .claude/
