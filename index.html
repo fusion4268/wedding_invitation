@@ -178,7 +178,22 @@ body{
   display:flex;align-items:center;justify-content:center;
   color:var(--muted);font-size:12px;
 }
+.g-cell{cursor:zoom-in;}
 .g-cell img{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* lightbox (click to view photo) */
+.lightbox{
+  position:fixed;inset:0;z-index:200;display:none;
+  align-items:center;justify-content:center;padding:16px;
+  background:rgba(20,18,15,.92);cursor:zoom-out;
+}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,.5);}
+.lightbox .lb-close{
+  position:absolute;top:14px;right:18px;width:40px;height:40px;
+  border:none;background:rgba(255,255,255,.12);color:#fff;border-radius:50%;
+  font-size:24px;line-height:1;cursor:pointer;
+}
 
 /* location */
 .loc-name{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:700;margin-bottom:4px;}
@@ -397,11 +412,17 @@ body{
 
   <!-- FAMILY / CONTACTS -->
   <section class="section center">
-    <div class="fam-row">
-      김기봉 <span class="dot">·</span> 임미자 <span class="label">의 장남</span> <span class="child">김진수</span>
-    </div>
-    <div class="fam-row">
-      정준규 <span class="dot">·</span> 백남희 <span class="label">의 장녀</span> <span class="child">정혜정</span>
+    <div class="fam-cards">
+      <div class="fam-card">
+        <div class="fam-row">
+          김기봉 <span class="dot">·</span> 임미자 <span class="label">의 장남</span> <span class="child">김진수</span>
+        </div>
+      </div>
+      <div class="fam-card">
+        <div class="fam-row">
+          정준규 <span class="dot">·</span> 백남희 <span class="label">의 장녀</span> <span class="child">정혜정</span>
+        </div>
+      </div>
     </div>
 
     <button class="contact-toggle" id="contactToggle">
