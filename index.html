@@ -108,8 +108,6 @@ body{
 }
 .hero-date .date{font-family:'Noto Serif KR',serif;font-size:17px;letter-spacing:.04em;color:var(--ink);}
 .hero-date .venue{font-family:'Noto Serif KR',serif;font-size:14px;color:var(--muted);margin-top:6px;}
-.scroll-hint{margin-top:28px;font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:.25em;color:var(--muted);animation:bob 1.8s ease-in-out infinite;}
-@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(6px);}}
 
 /* section title */
 .s-title{font-family:'Cormorant Garamond',serif;letter-spacing:.34em;font-size:13px;color:var(--accent-deep);text-transform:uppercase;margin-bottom:18px;}
@@ -329,10 +327,6 @@ body{
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-@media(prefers-reduced-motion:reduce){
-  /* 꽃잎은 청첩장의 핵심 연출이라 동작 줄이기 상태에서도 유지 */
-  .scroll-hint{animation:none;}
-}
 </style>
 </head>
 <body>
