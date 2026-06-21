@@ -639,33 +639,46 @@ body{
   }
 })();
 
-// gallery: 메인 사진을 앨범 맨 앞에 추가 + 사진 클릭 시 확대 보기
+// album: 가로 스와이프 캐러셀 + 하단 썸네일 프리뷰 + 사진 클릭 시 확대 보기
 (function(){
   const gallery=document.querySelector('.gallery');
+  if(!gallery) return;
   const heroImg=document.querySelector('.hero-photo-full img');
-  // 메인 사진을 앨범 첫 칸으로 추가 (base64 중복 없이 같은 src 재사용)
-  if(gallery && heroImg){
-    const cell=document.createElement('div');
-    cell.className='g-cell';
-    const im=document.createElement('img');
-    im.src=heroImg.currentSrc||heroImg.src;
-    im.alt='메인 사진';
-    cell.appendChild(im);
-    gallery.insertBefore(cell, gallery.firstChild);
-  }
-  const lb=document.getElementById('lightbox');
-  const lbImg=document.getElementById('lbImg');
-  const lbClose=document.getElementById('lbClose');
-  if(!lb||!lbImg) return;
-  function open(src){ lbImg.src=src; lb.classList.add('open'); document.body.style.overflow='hidden'; }
-  function close(){ lb.classList.remove('open'); document.body.style.overflow=''; lbImg.removeAttribute('src'); }
-  if(gallery) gallery.addEventListener('click',function(e){
-    const img=e.target.closest('img'); if(img) open(img.currentSrc||img.src);
+  // 메인 사진을 맨 앞에, 이어서 기존 앨범 사진들 (base64 중복 없이 src 재사용)
+  const srcs=[];
+  if(heroImg) srcs.push(heroImg.currentSrc||heroImg.src);
+  gallery.querySelectorAll('.g-cell img').forEach(im=>srcs.push(im.currentSrc||im.src));
+
+  const track=document.createElement('div'); track.className='album-track';
+  const thumbs=document.createElement('div'); thumbs.className='album-thumbs';
+  srcs.forEach(function(src,idx){
+    const slide=document.createElement('div'); slide.className='album-slide';
+    const im=document.createElement('img'); im.src=src; im.alt='웨딩 사진 '+(idx+1); im.loading='lazy';
+    slide.appendChild(im); track.appendChild(slide);
+    const tb=document.createElement('button'); tb.type='button'; tb.className='album-thumb'+(idx===0?' active':'');
+    const tim=document.createElement('img'); tim.src=src; tim.alt=''; tim.loading='lazy';
+    tb.appendChild(tim); thumbs.appendChild(tb);
+    tb.addEventListener('click',function(){ track.scrollTo({left:idx*(track.clientWidth+8),behavior:'smooth'}); });
   });
-  if(heroImg){ heroImg.style.cursor='zoom-in'; heroImg.addEventListener('click',()=>open(heroImg.currentSrc||heroImg.src)); }
-  lb.addEventListener('click',close);
-  if(lbClose) lbClose.addEventListener('click',function(e){ e.stopPropagation(); close(); });
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  gallery.classList.remove('gallery'); gallery.classList.add('album');
+  gallery.innerHTML=''; gallery.appendChild(track); gallery.appendChild(thumbs);
+
+  function syncActive(){
+    const active=Math.max(0,Math.min(srcs.length-1,Math.round(track.scrollLeft/(track.clientWidth+8))));
+    Array.prototype.forEach.call(thumbs.children,function(t,i){ t.classList.toggle('active',i===active); });
+  }
+  let raf; track.addEventListener('scroll',function(){ cancelAnimationFrame(raf); raf=requestAnimationFrame(syncActive); });
+
+  const lb=document.getElementById('lightbox'), lbImg=document.getElementById('lbImg'), lbClose=document.getElementById('lbClose');
+  if(lb&&lbImg){
+    const open=function(src){ lbImg.src=src; lb.classList.add('open'); document.body.style.overflow='hidden'; };
+    const close=function(){ lb.classList.remove('open'); document.body.style.overflow=''; lbImg.removeAttribute('src'); };
+    track.addEventListener('click',function(e){ const img=e.target.closest('img'); if(img) open(img.currentSrc||img.src); });
+    if(heroImg){ heroImg.style.cursor='zoom-in'; heroImg.addEventListener('click',function(){ open(heroImg.currentSrc||heroImg.src); }); }
+    lb.addEventListener('click',close);
+    if(lbClose) lbClose.addEventListener('click',function(e){ e.stopPropagation(); close(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  }
 })();
 
 // toast helper
