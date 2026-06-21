@@ -4,3 +4,10 @@ auto-deploy.ps1
 auto-deploy.log
 rsvp_appsscript.gs
 .claude/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
