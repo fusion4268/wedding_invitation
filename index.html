@@ -754,10 +754,25 @@ document.querySelectorAll('.copy-btn').forEach(btn=>{
   document.getElementById('modalLater').addEventListener('click',close);
   overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
   document.getElementById('mSubmit').addEventListener('click',()=>{
+    const sideBtn=document.querySelector('.seg[data-group="m_side"] button.active');
+    const side=sideBtn?sideBtn.getAttribute('data-val'):'';
     const name=document.getElementById('mName').value.trim();
+    const count=parseInt(document.getElementById('mCount').value,10);
+    if(!side){toast('신랑 측 / 신부 측을 선택해 주세요.');return;}
     if(!name){toast('성함을 입력해 주세요.');return;}
-    close();
-    toast('참석 의사가 전달되었습니다. 감사합니다!');
+    if(!count||count<1){toast('참석 인원을 입력해 주세요.');return;}
+    const btn=document.getElementById('mSubmit');
+    // 엔드포인트 미설정 시: 전송 없이 안내만 (배포 URL 입력 전 동작)
+    if(!RSVP_ENDPOINT){ close(); toast('참석 의사가 전달되었습니다. 감사합니다!'); return; }
+    const orig=btn.textContent; btn.disabled=true; btn.textContent='전송 중...';
+    fetch(RSVP_ENDPOINT,{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({side,name,count})
+    })
+    .then(()=>{ close(); toast('참석 의사가 전달되었습니다. 감사합니다!'); })
+    .catch(()=>{ toast('전송에 실패했어요. 잠시 후 다시 시도해 주세요.'); })
+    .finally(()=>{ btn.disabled=false; btn.textContent=orig; });
   });
   // 청첩장에 들어오면 참석 의사 팝업을 자동으로 표시 (히어로가 잠깐 보인 뒤)
   setTimeout(open, 1200);
